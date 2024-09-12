@@ -11,10 +11,10 @@ option(TEST "Enable testing" ON)
 #if TEST option is enabled, then include the googletest framework
 if(TEST)
     message("Testing is enabled")
-    set(googletest_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../googletest)
-    set(googletest_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../googletest)
-    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
-    include_directories(${googletest_INCLUDE_DIRS})
+    find_package(GTest REQUIRED)
+    
+    include_directories(${GTEST_INCLUDE_DIRS})
+
 else()
     message("Testing is disabled")
 endif()
@@ -52,6 +52,6 @@ if(TEST)
         RUNTIME_OUTPUT_DIRECTORY ${EXECUTABLE_DIR}
     )
     # Link the library to the test executable
-    target_link_libraries(testApp PRIVATE sumLib gtest_main gmock_main)
+    target_link_libraries(testApp PRIVATE sumLib ${GTEST_BOTH_LIBRARIES} pthread)
 endif()
 
