@@ -56,6 +56,55 @@ TEST_P(ValidatorTestNoRange, TestInvalidRange) {
 INSTANTIATE_TEST_SUITE_P(TestInRangeTrue, ValidatorTestRange, ::testing::Values(0, 50, 100));
 INSTANTIATE_TEST_SUITE_P(TestInRangeFalse, ValidatorTestNoRange, ::testing::Values(-100, -1 , 101, 250, 10000));
 
+
+
+
+class ValidatorTestFixtureTuple: public ::testing::TestWithParam<std::tuple<int,Error_nCode>> {
+    protected:
+    public:
+        ValidatorTestFixtureTuple() {
+            printf("Constructor Called\n");
+        }
+        ~ValidatorTestFixtureTuple() {
+            printf("Destructor Called\n");
+        }
+        void SetUp() override {
+            printf("SetUp Called\n");
+        }
+        void TearDown() override {
+            printf("TearDown Called\n");
+        }
+        static void SetUpTestCase() {
+            printf("SetUpTestCase Called\n");
+        }
+        static void TearDownTestCase() {
+            printf("TearDownTestCase Called\n");
+        }
+};
+
+
+
+class ValidatorTestTuple: public ValidatorTestFixtureTuple {
+    protected:
+        Validator validator{16, 100};
+    public:
+};
+
+TEST_P(ValidatorTestTuple, TestTuple) {
+    std::tuple<int,Error_nCode> tuple = GetParam();
+    int value = std::get<0>(tuple);
+    Error_nCode expected = std::get<1>(tuple);
+    printf("TestInRange Called with value: %d, and expected result: %d\n", value, (int) expected);
+    Error_nCode enErrorCode = validator.inRange(value);
+
+    ASSERT_EQ(enErrorCode, expected);
+}
+
+INSTANTIATE_TEST_SUITE_P(TestTupleOK, ValidatorTestTuple, ::testing::Values(
+                                                                std::make_tuple(0, Error_enCode_INVALID_VALUE), 
+                                                                std::make_tuple(50, Error_enCode_OK), 
+                                                                std::make_tuple(100, Error_enCode_OK)));
+
 int main(int argc, char **argv) {
 
     /*
